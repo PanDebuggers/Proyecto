@@ -1,1 +1,30 @@
+# -----------------------------------------
+# Archivo .gitignore
+# Creado con ayuda de ChatGPT
+# Este archivo indica a Git qué archivos y carpetas debe ignorar (no subir al repositorio)
+# -----------------------------------------
 
+
+
+# Ignorar archivos del sistema operativo (Mac y Windows)
+.DS_Store
+Thumbs.db
+
+# Ignorar archivos temporales o de respaldo
+*.log      # Archivos de registro (logs)
+*.tmp      # Archivos temporales
+*.bak      # Archivos de respaldo
+*.swp      # Archivos swap de editores de texto (como Vim)
+
+# Ignorar carpetas de dependencias (depende del lenguaje o framework)
+node_modules/   # Dependencias de Node.js
+venv/           # Entorno virtual de Python
+__pycache__/    # Archivos de caché de Python
+
+# Ignorar archivos de bases de datos locales
+*.sqlite3
+
+# Ignorar carpetas de configuración de editores
+.env        # Variables de entorno
+.idea/      # Configuración de IntelliJ IDEA / PyCharm
+.vscode/    # Configuración de Visual Studio Code
