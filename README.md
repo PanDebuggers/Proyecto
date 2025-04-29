@@ -9,7 +9,7 @@ Integrantes:
 🧑‍💻 Marín Vanegas Edwin Andrés — edmarinv@unal.edu.co
 🧑‍💻 Pinzón Yossa Diego Steven — dpinzony@unal.edu.co
 
-📄 Descripción del Repositorio
+📄 Descripción del Repositorio:
 Repositorio creado para el curso de Ingeniería de Software 1 (2025-1).
 Aquí se documentarán todos los avances, asignaciones y entregables del grupo PanDebuggers.
 
