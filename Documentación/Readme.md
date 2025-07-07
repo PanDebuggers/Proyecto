@@ -1,4 +1,5 @@
 💊 MediCareDesk 💊
+![MediCareDesk_Logo 2  255x255](https://github.com/user-attachments/assets/f5d515d8-c18c-4bd1-811d-70e71703f640)
 
 👥 Grupo 3: PanDebuggers Integrantes:
 
