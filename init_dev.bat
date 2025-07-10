@@ -1,6 +1,10 @@
-cho -----------------------------------------------
+@echo off
+title Inicialización MediCareDesk - Entorno de Desarrollo
+echo -----------------------------------------------
+echo Iniciando el entorno de desarrollo de MediCareDesk...
+echo -----------------------------------------------
 
-REM Verificar si Python está instalado
+REM 1. Verificar si Python está instalado
 where python >nul 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Python no está instalado. Por favor instálalo desde https://www.python.org/downloads/
@@ -8,26 +12,26 @@ IF %ERRORLEVEL% NEQ 0 (
     exit /b
 )
 
-REM Crear entorno virtual llamado "env"
+REM 2. Crear entorno virtual llamado "env"
 echo.
-echo [INFO] Creando entorno virtual (env)
+echo [INFO] Creando entorno virtual (env)...
 python -m venv env
 
-REM Activar entorno virtual
+REM 3. Activar entorno virtual
 call env\Scripts\activate.bat
 
-REM Instalar dependencias necesarias del proyecto
+REM 4. Instalar dependencias necesarias del proyecto
 echo.
-echo [INFO] Instalando dependencias del proyecto
+echo [INFO] Instalando dependencias del proyecto...
 pip install --upgrade pip
 pip install mysql-connector-python schedule reportlab fpdf pylint flake8
 
-REM Inicializar la base de datos con un script de Python
+REM 5. (OPCIONAL) Inicializar la base de datos
 echo.
-echo [INFO] Inicializando la base de datos
-python init_db.py
+echo [INFO] Saltando inicialización de base de datos porque aún no existe.
+REM python init_db.py
 
-REM Ejecutar el sistema principal (cuando esté listo)
+REM 6. Ejecutar la aplicación
 echo.
 echo [INFO] Ejecutando el sistema MediCareDesk...
 python main.py
@@ -36,3 +40,4 @@ echo.
 echo -----------------------------------------------
 echo Proceso de inicialización finalizado.
 pause
+
