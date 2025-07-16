@@ -30,3 +30,4 @@ Diseñar e implementar un sistema que permita administrar y supervisar el consum
 #Enlaces utiles 
 [Plantilla de planificacion excel](https://docs.google.com/spreadsheets/d/11U0Kp9dNbDXdJnveMGn7cTpx3nsPMucN0Af8zYZFcEo/edit?usp=sharing)
 [Gestion del proyecto en JIRA] ( https://medicaredesk.atlassian.net/jira/software/projects/SCRUM/summary ) 
+[Diagrama base de datos-dbdiagram.io] (https://dbdiagram.io/d/f-MediCareDesk-68770e1ff413ba35081173ef) 
