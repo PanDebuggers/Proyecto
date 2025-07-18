@@ -81,17 +81,6 @@ MediCareDesk/
 │ └── utils/ # Funciones auxiliares y patrones de diseño
 └── tests/ # Pruebas unitarias
 
-yaml
-Copiar
-Editar
-
----
-
-## 🛠️ Requisitos
-
-- Python 3.8 o superior
-- pip (administrador de paquetes de Python)
-
 ---
 
 ## 📥 Instalación

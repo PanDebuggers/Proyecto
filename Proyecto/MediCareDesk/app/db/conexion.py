@@ -1,4 +1,6 @@
-#Conexion de la base de datos. Creado por CatherineHerrera96
+# Creado por CatherineHerrera96
+#Conexion de la base de datos. 
+
 import sqlite3
 import os
 
