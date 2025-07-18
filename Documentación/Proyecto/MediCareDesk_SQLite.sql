@@ -33,7 +33,7 @@ VALUES
   (3, 'Alex Rojas', 59, 'Otro', '3012345678', 'Alérgico a penicilina', 1);
 
 CREATE TABLE `Cuidador` (
-  `id_cuidador` int PRIMARY KEY ,
+  `id_cuidador` int PRIMARY KEY AUTOINCREMENT,
   `nombre` varchar(100) NOT NULL,
   `relacion` varchar(50),
   `contacto` varchar(15),
@@ -56,7 +56,7 @@ CREATE TABLE `Paciente_Cuidador` (
 );
 
 CREATE TABLE `Medicamento` (
-  `id_medicamento` int PRIMARY KEY ,
+  `id_medicamento` int PRIMARY KEY AUTOINCREMENT ,
   `nombre` varchar(100) NOT NULL, 
   `principio_activo` varchar(100),
   `indicaciones` text,
@@ -75,7 +75,7 @@ VALUES
   (3, 'Salbutamol', 'Salbutamol', 'Crisis asmáticas', '2024-12-31', 'Evitar uso excesivo sin control médico', 'Solución inyectable', 'GlaxoSmithKline');
 
 CREATE TABLE `Tratamiento` (
-  `id_tratamiento` int PRIMARY KEY ,
+  `id_tratamiento` int PRIMARY KEY AUTOINCREMENT,
   `id_paciente` int NOT NULL,
   `nombre_tratamiento` varchar(200) NOT NULL,
   `objetivo` text,
@@ -89,7 +89,7 @@ CREATE TABLE `Tratamiento` (
 );
 
 CREATE TABLE `Tratamiento_Medicamento` (
-  `id_tratamiento_medicamento` int PRIMARY KEY ,
+  `id_tratamiento_medicamento` int PRIMARY KEY AUTOINCREMENT,
   `id_tratamiento` int NOT NULL,
   `id_medicamento` int NOT NULL,
   `dosis` varchar(500),
@@ -105,7 +105,7 @@ CREATE TABLE `Tratamiento_Medicamento` (
 );
 
 CREATE TABLE `Toma` (
-  `id_toma` int PRIMARY KEY ,
+  `id_toma` int PRIMARY KEY AUTOINCREMENT,
   `id_tratamiento_medicamento` int NOT NULL,
   `fecha` date NOT NULL,
   `hora_programada` time NOT NULL,
@@ -118,7 +118,7 @@ CREATE TABLE `Toma` (
 );
 
 CREATE TABLE `Bitacora_Eventos` (
-  `id_evento` int PRIMARY KEY ,
+  `id_evento` int PRIMARY KEY AUTOINCREMENT,
   `id_paciente` int NOT NULL,
   `tipo_evento` TEXT CHECK (tipo_evento IN ('medicamento_tomado', 'medicamento_omitido', 'efecto_adverso', 'interaccion_detectada', 'cambio_tratamiento', 'recordatorio_enviado', 'sistema', 'otro')) DEFAULT 'otro',
   `descripcion` text,
