@@ -1,0 +1,1 @@
+cuidador_actual = None
