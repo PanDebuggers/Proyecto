@@ -1,16 +1,13 @@
+from app.db.modelos import buscar_cuidador_por_email
 import tkinter as tk
-from app import session
+from tkinter import Frame
 
-class MenuLateral(tk.Frame):
-    def __init__(self, master=None):
+class MenuLateral(Frame):
+    def __init__(self, master, email_cuidador):
         super().__init__(master)
-        self.master = master
-        self.pack()
-        self.mostrar_usuario()
 
-    def mostrar_usuario(self):
-        cuidador = session.cuidador_actual
-        if cuidador:
-            nombre = cuidador["nombre"]
-            label_usuario = tk.Label(self, text=f"Cuidador: {nombre}")
-            label_usuario.pack(pady=5)
+        cuidador = buscar_cuidador_por_email(email_cuidador)
+        nombre_cuidador = cuidador[1] if cuidador else "Usuario"
+
+        label_nombre = tk.Label(self, text=f"Bienvenido: {nombre_cuidador}")
+        label_nombre.pack()

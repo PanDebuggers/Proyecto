@@ -1,7 +1,24 @@
-Esta carpeta cuenta con script importantes para la base de datos, por ejemplo para insertar datos para las pruebas unitarias (como es el caso de insertar_cuidador_test.py), tambien para eliminar datos (eliminar_cuidador_test.py) e incluso tiene uno en caso de querer reiniciar toda la base de datos (reconstruir_base_datos).
-**⚠️ Este proceso borra todo.**
+# 🛠️ Scripts de mantenimiento — MediCareDesk
 
-Pasos:
-1. Asegúrate de tener el archivo `MediCareDesk_SQLite.sql` actualizado.
-2. Ejecuta: `python scripts/reconstruir_base_datos.py`
-3. Luego vuelve a insertar los datos de prueba necesarios.
+Este directorio contiene herramientas para reiniciar o limpiar la base de datos durante el desarrollo.
+
+---
+
+## limpiar_tablas.py
+Vacía TODAS las tablas de datos (sin borrar estructura ni archivo .db).
+
+🟢 Úsalo antes de hacer `git push`.
+
+---
+
+## borrar_tabla.py
+Vacía UNA tabla específica. Edita la variable `tabla` antes de ejecutarlo.
+
+🔐 Incluye confirmación para evitar errores.
+
+---
+
+## restaurar_base.py
+Elimina el archivo `.db` y crea una base nueva desde `MediCareDesk_SQLite.sql`.
+
+⚠️ Destruye todos los datos. Úsalo solo si necesitas empezar completamente desde cero.

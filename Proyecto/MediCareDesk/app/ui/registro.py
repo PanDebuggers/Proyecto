@@ -1,101 +1,62 @@
 import tkinter as tk
 from tkinter import messagebox
-from app.db.conexion import get_connection
+from app.db.modelos import insertar_cuidador
 
 class RegistroView(tk.Frame):
-    def __init__(self, master, volver_a_login, on_login_success):
-        super().__init__(master, bg="#f9f9f9")
+    def __init__(self, master, volver_callback):
+        super().__init__(master)
         self.master = master
-        self.volver_a_login = volver_a_login
-        self.on_login_success = on_login_success
-        self.pack(expand=True, fill="both")
-        self.create_widgets()
+        self.volver = volver_callback
+        self.pack()
+        self.crear_interfaz()
 
-    def create_widgets(self):
-        self.master.title("Registro de cuidador")
+    def crear_interfaz(self):
+        tk.Label(self, text="Registro de cuidador", font=("Helvetica", 16)).pack(pady=10)
 
-        contenedor = tk.Frame(self, bg="#f9f9f9")
-        contenedor.place(relx=0.5, rely=0.5, anchor="center")
+        self.nombre = tk.Entry(self)
+        self.relacion = tk.Entry(self)
+        self.contacto = tk.Entry(self)
+        self.email = tk.Entry(self)
+        self.password = tk.Entry(self, show="*")
+        self.confirmar_password = tk.Entry(self, show="*")
 
-        tk.Label(contenedor, text="Registro de cuidador", font=("Helvetica", 18, "bold"), bg="#f9f9f9")\
-            .pack(pady=(0, 20))
+        for label, entry in [
+            ("Nombre completo", self.nombre),
+            ("Relación con el paciente", self.relacion),
+            ("Teléfono", self.contacto),
+            ("Correo electrónico", self.email),
+            ("Contraseña", self.password),
+            ("Confirmar contraseña", self.confirmar_password)
+        ]:
+            tk.Label(self, text=label).pack()
+            entry.pack()
 
-        self.entries = {}
-
-        campos = [
-            ("Nombre completo", "nombre"),
-            ("Relación con el paciente", "relacion"),
-            ("Teléfono (opcional)", "contacto"),
-            ("Correo electrónico", "email"),
-            ("Contraseña", "password"),
-            ("Confirmar contraseña", "confirmar_password")
-        ]
-
-        for label_text, key in campos:
-            tk.Label(contenedor, text=label_text, bg="#f9f9f9", font=("Helvetica", 12, "bold"), anchor="w")\
-                .pack(anchor="w", padx=10)
-            show = "*" if "password" in key else ""
-            entry = tk.Entry(contenedor, width=35, show=show, font=("Helvetica", 11), relief="solid", bd=1)
-            entry.pack(pady=5, padx=10, ipady=3)
-            self.entries[key] = entry
-
-        # Casilla de términos
-        self.acepta_terminos = tk.IntVar()
-        self.check_terminos = tk.Checkbutton(
-            contenedor, text="Acepto términos y condiciones", variable=self.acepta_terminos,
-            command=self.toggle_boton, bg="#f9f9f9", font=("Helvetica", 10)
-        )
-        self.check_terminos.pack(pady=(10, 5))
-
-        # Botón de registro
-        self.btn_registrarse = tk.Button(
-            contenedor, text="Registrarse", command=self.registrar, state="disabled",
-            bg="#007acc", fg="white", font=("Helvetica", 12, "bold"), relief="flat", width=25
-        )
-        self.btn_registrarse.pack(pady=(5, 15))
-
-        # Enlace para volver
-        btn_volver = tk.Button(
-            contenedor, text="¿Ya estás registrado? Inicia sesión", command=self.volver,
-            fg="blue", relief="flat", bg="#f9f9f9", font=("Helvetica", 10, "underline"), cursor="hand2"
-        )
-        btn_volver.pack(pady=(0, 10))
-
-
-    def toggle_boton(self):
-        self.btn_registrarse.config(state="normal" if self.acepta_terminos.get() else "disabled")
+        tk.Button(self, text="Registrarme", command=self.registrar).pack(pady=10)
+        tk.Button(self, text="Volver", command=self.volver_a_login).pack()
 
     def registrar(self):
-        nombre = self.entries["nombre"].get().strip()
-        relacion = self.entries["relacion"].get().strip()
-        contacto = self.entries["contacto"].get().strip() or None
-        email = self.entries["email"].get().strip()
-        password = self.entries["password"].get().strip()
-        confirmar = self.entries["confirmar_password"].get().strip()
+        nombre = self.nombre.get()
+        relacion = self.relacion.get()
+        contacto = self.contacto.get()
+        email = self.email.get()
+        password = self.password.get()
+        password2 = self.confirmar_password.get()
 
-        if not all([nombre, relacion, email, password, confirmar]):
-            messagebox.showwarning("Campos incompletos", "Por favor completa los campos obligatorios.")
+        if not all([nombre, relacion, contacto, email, password, password2]):
+            messagebox.showwarning("Campos incompletos", "Completa todos los campos.")
             return
 
-        if password != confirmar:
+        if password != password2:
             messagebox.showerror("Error", "Las contraseñas no coinciden.")
             return
 
-        conn = get_connection()
-        cursor = conn.cursor()
         try:
-            cursor.execute("""
-                INSERT INTO Cuidador (nombre, relacion, contacto, email, password_hash)
-                VALUES (?, ?, ?, ?, ?)
-            """, (nombre, relacion, contacto, email, password))
-            conn.commit()
+            insertar_cuidador(nombre, relacion, contacto, email, password)
             messagebox.showinfo("Registro exitoso", "Ya puedes iniciar sesión.")
-            self.volver()
+            self.volver_a_login()
         except Exception:
             messagebox.showerror("Error", "Ya existe un usuario con ese correo.")
-        finally:
-            conn.close()
 
-    def volver(self):
+    def volver_a_login(self):
         self.destroy()
-        self.volver_a_login(master=self.master, on_login_success=self.on_login_success)
+        self.volver()

@@ -1,22 +1,10 @@
-# creado por CatherineHerrera96
-from app.db.conexion import get_connection
+from app.db.modelos import (
+    buscar_cuidador_por_credenciales,
+    buscar_cuidador_por_email
+)
 
 def validar_credenciales(email, password):
-    conn = get_connection()
-    cursor = conn.cursor()
-    query = "SELECT * FROM Cuidador WHERE email = ? AND password_hash = ?"
-    cursor.execute(query, (email, password))
-    cuidador = cursor.fetchone()
-    conn.close()
-    return cuidador is not None
+    return buscar_cuidador_por_credenciales(email, password) is not None
 
 def obtener_cuidador_por_email(email):
-    """
-    Retorna el registro completo del cuidador según su email.
-    """
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Cuidador WHERE email = ?", (email,))
-    cuidador = cursor.fetchone()
-    conn.close()
-    return cuidador
+    return buscar_cuidador_por_email(email)
