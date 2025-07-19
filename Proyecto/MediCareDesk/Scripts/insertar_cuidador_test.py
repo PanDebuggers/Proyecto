@@ -1,5 +1,5 @@
 #Creado por CatherineHerrera96
-#inserta datos a Cuidador para realizar las pruebas unitarias
+#inserta datos a Cuidador para realizar las pruebas unitarias para el login
 import sqlite3
 
 conn = sqlite3.connect("data/MediCareDesk.db")

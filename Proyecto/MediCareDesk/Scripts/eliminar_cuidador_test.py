@@ -1,4 +1,4 @@
-#Creado por CatherineHerrera96
+#Limpia la tabla cuidador
 import sqlite3
 
 conn = sqlite3.connect("data/MediCareDesk.db")
