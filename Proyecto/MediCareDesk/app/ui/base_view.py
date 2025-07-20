@@ -38,9 +38,10 @@ def iniciar_aplicacion(email, root):
     frame_dinamico = tk.Frame(frame_derecho, bg="#f0f0f0", bd=2, relief="groove")
     frame_dinamico.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-    img_path = os.path.abspath("resources/iconos/MediCareDesk_Logo_255x255.png")
-    if os.path.exists(img_path):
-        imagen_defecto = tk.PhotoImage(file=img_path)
+    IMG_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "resources", "iconos", "MediCareDesk_Logo_255x255.png")
+    IMG_PATH = os.path.abspath(IMG_PATH)
+    if os.path.exists(IMG_PATH):
+        imagen_defecto = tk.PhotoImage(file=IMG_PATH)
         lbl_imagen = tk.Label(frame_dinamico, image=imagen_defecto, bg="#f0f0f0")
         lbl_imagen.image = imagen_defecto
         lbl_imagen.pack(expand=True)
