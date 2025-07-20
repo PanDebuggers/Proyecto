@@ -1,16 +1,23 @@
 import tkinter as tk
 import customtkinter as ctk
 import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 from app.ui.menu_lateral import MenuLateral
 from app.ui.pacientes import mostrar_pacientes
 from app.ui.medicamentos import mostrar_medicamentos
 from app.ui.tratamientos import mostrar_tratamientos
 from app.ui.login import LoginView
+from app import session
+
 
 def mostrar_login(root):
     for widget in root.winfo_children():
         widget.destroy()
     LoginView(master=root, on_login_success=lambda email: iniciar_aplicacion(email, root))
+
 
 def iniciar_aplicacion(email, root):
     print(f"Iniciando aplicación. Usuario: {email}")
@@ -46,8 +53,13 @@ def iniciar_aplicacion(email, root):
     lbl_alerta = tk.Label(frame_alertas, text="Sin alertas", bg="#f0f0f0", fg="red", font=("Arial", 12))
     lbl_alerta.pack(pady=5)
 
+    # ✅ Toma el id del cuidador logueado desde session
+    cuidador_actual = session.cuidador_actual
+    id_cuidador = cuidador_actual["id_cuidador"]
+
     # Asignar funcionalidad a los botones
-    menu_lateral.btn_pacientes.configure(command=lambda: mostrar_pacientes(frame_dinamico))
+    menu_lateral.btn_pacientes.configure(command=lambda: mostrar_pacientes(frame_dinamico, id_cuidador))
     menu_lateral.btn_medicamentos.configure(command=lambda: mostrar_medicamentos(frame_dinamico))
     menu_lateral.btn_tratamientos.configure(command=lambda: mostrar_tratamientos(frame_dinamico))
     menu_lateral.btn_logout.configure(command=lambda: mostrar_login(root))
+

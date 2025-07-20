@@ -1,10 +1,13 @@
 import tkinter as tk
+import customtkinter as ctk
 from tkinter import messagebox
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 from app.logic.auth import validar_credenciales, obtener_cuidador_por_email
 from app.ui.registro import RegistroView
 from app import session
-import os
-import customtkinter as ctk
+
 
 class LoginView(tk.Frame):
     def __init__(self, master, on_login_success):
@@ -40,9 +43,12 @@ class LoginView(tk.Frame):
         password = self.password_entry.get()
 
         if validar_credenciales(email, password):
-            session.cuidador_actual = obtener_cuidador_por_email(email)
+            # ✅ Obtener datos completos del cuidador
+            cuidador = obtener_cuidador_por_email(email)
+            session.cuidador_actual = cuidador
             messagebox.showinfo("Bienvenido", f"Inicio de sesión exitoso para {email}")
-            self.on_login_success(email)
+            # ✅ Pasar cuidador completo, no solo el email
+            self.on_login_success(cuidador)
         else:
             messagebox.showerror("Error", "Credenciales incorrectas.")
 

@@ -1,4 +1,4 @@
--- Crear tabla Paciente
+-- Crear tabla Paciente 
 CREATE TABLE IF NOT EXISTS Paciente (
   id_paciente INTEGER PRIMARY KEY,
   nombre TEXT NOT NULL,
@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS Paciente (
   contacto_emergencia TEXT,
   observaciones TEXT,
   fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  activo INTEGER CHECK (activo IN (0,1)) DEFAULT 1
+  activo INTEGER CHECK (activo IN (0,1)) DEFAULT 1,
+  id_cuidador INTEGER  -- sin NOT NULL
 );
 
 -- Crear tabla Cuidador
@@ -80,3 +81,50 @@ CREATE TABLE IF NOT EXISTS Evento (
   descripcion TEXT NOT NULL,
   FOREIGN KEY (id_paciente) REFERENCES Paciente(id_paciente)
 );
+
+-- Crear tabla Cuidador_Paciente
+CREATE TABLE IF NOT EXISTS Cuidador_Paciente (
+  id_cuidador INTEGER NOT NULL,
+  id_paciente INTEGER NOT NULL,
+  PRIMARY KEY (id_cuidador, id_paciente),
+  FOREIGN KEY (id_cuidador) REFERENCES Cuidador(id_cuidador),
+  FOREIGN KEY (id_paciente) REFERENCES Paciente(id_paciente)
+);
+
+
+-- Vista Pacientes 
+CREATE VIEW IF NOT EXISTS Vista_Pacientes AS
+SELECT 
+    p.id_paciente,
+    p.nombre,
+    p.edad,
+    p.genero,
+    p.contacto_emergencia,
+    p.activo,
+    cp.id_cuidador,
+    COUNT(t.id_tratamiento) AS tratamientos_totales,
+    SUM(CASE WHEN t.estado = 'activo' THEN 1 ELSE 0 END) AS tratamientos_activos
+FROM 
+    Paciente p
+JOIN
+    Cuidador_Paciente cp ON p.id_paciente = cp.id_paciente
+LEFT JOIN 
+    Tratamiento t ON p.id_paciente = t.id_paciente
+GROUP BY 
+    p.id_paciente, cp.id_cuidador;
+
+
+-- Vista Tratamientos
+CREATE VIEW IF NOT EXISTS Vista_Tratamientos AS
+SELECT 
+    t.id_tratamiento,
+    t.nombre_tratamiento,
+    t.descripcion,
+    t.estado,
+    t.fecha_inicio,
+    t.fecha_fin,
+    p.nombre AS paciente_nombre
+FROM
+    Tratamiento t
+JOIN
+    Paciente p ON t.id_paciente = p.id_paciente;

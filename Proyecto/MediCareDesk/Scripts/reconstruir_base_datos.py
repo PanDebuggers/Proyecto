@@ -4,11 +4,13 @@
 import sqlite3
 import os
 
-SQL_FILE = "MediCareDesk_SQLite.sql"
-DB_PATH = "data/MediCareDesk.db"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+SQL_FILE = os.path.join(BASE_DIR, "..", "MediCareDesk_SQLite.sql")
+DB_PATH = os.path.join(BASE_DIR, "..", "data", "MediCareDesk.db")
 
 confirm = input("⚠️ Esto eliminará TODA la base de datos y la reconstruirá. Escribe REINICIAR para continuar: ")
-if confirm != "REINICIAR":
+if confirm.upper() != "REINICIAR":
     exit("❌ Operación cancelada.")
 
 if os.path.exists(DB_PATH):

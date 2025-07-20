@@ -1,4 +1,7 @@
 import tkinter as tk
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 from app.ui.login import LoginView
 
 from app.ui.base_view import iniciar_aplicacion  # Se importa la función de arranque
