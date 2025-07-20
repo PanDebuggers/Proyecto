@@ -29,7 +29,13 @@ class RegistroView(tk.Frame):
             "Teléfono", "Correo electrónico", "Contraseña", "Confirmar contraseña"
         ]:
             tk.Label(container, text=label_text, font=("Arial", 12), bg="#f0f0f0").pack(anchor="w")
-            entry = tk.Entry(container, width=35, font=("Arial", 13), show="*" if "Contraseña" in label_text else "")
+
+            entry = tk.Entry(
+                container,
+                width=35,
+                font=("Arial", 13),
+                show="*" if "contraseña" in label_text.lower() else ""
+            )
             entry.pack(pady=5)
             self.campos[label_text] = entry
 
