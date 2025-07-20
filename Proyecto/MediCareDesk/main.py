@@ -1,19 +1,14 @@
-# main.py
-
 import tkinter as tk
 from app.ui.login import LoginView
-from app.ui.menu_lateral import MenuLateral
 
-def iniciar_aplicacion(correo_usuario):
-    for widget in root.winfo_children():
-        widget.destroy()
-    MenuLateral(root, correo_usuario).pack(fill="both", expand=True)
+from app.ui.base_view import iniciar_aplicacion  # Se importa la función de arranque
 
-root = tk.Tk()
-root.title("MediCareDesk")
-root.state("zoomed")  # Inicia maximizado
+if __name__ == "__main__":
+    root = tk.Tk()
+    root.title("MediCareDesk")
+    root.state("zoomed")  # Inicia maximizado
 
-# Vista inicial: login
-LoginView(master=root, on_login_success=iniciar_aplicacion)
+    # Cargar la vista de login
+    LoginView(master=root, on_login_success=lambda email: iniciar_aplicacion(email, root))
 
-root.mainloop()
+    root.mainloop()

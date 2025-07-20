@@ -3,27 +3,37 @@ from tkinter import messagebox
 from app.logic.auth import validar_credenciales, obtener_cuidador_por_email
 from app.ui.registro import RegistroView
 from app import session
+import os
+import customtkinter as ctk
 
 class LoginView(tk.Frame):
     def __init__(self, master, on_login_success):
         super().__init__(master)
         self.master = master
         self.on_login_success = on_login_success
-        self.pack()
+        self.pack(fill="both", expand=True)
         self.crear_interfaz()
 
     def crear_interfaz(self):
-        tk.Label(self, text="Iniciar sesión", font=("Helvetica", 16)).pack(pady=10)
+        container = tk.Frame(self, bg="#f0f0f0")
+        container.place(relx=0.5, rely=0.5, anchor="center")
 
-        self.email_entry = tk.Entry(self, width=30)
-        self.password_entry = tk.Entry(self, width=30, show="*")
+        logo_path = os.path.abspath("resources/iconos/MediCareDesk_Logo_255x255.png")
+        if os.path.exists(logo_path):
+            self.logo = tk.PhotoImage(file=logo_path)
+            tk.Label(container, image=self.logo, bg="#f0f0f0").pack(pady=(0, 15))
+
+        tk.Label(container, text="Iniciar sesión", font=("Helvetica", 18, "bold"), bg="#f0f0f0").pack(pady=(0, 20))
+
+        self.email_entry = tk.Entry(container, width=35, font=("Arial", 13))
+        self.password_entry = tk.Entry(container, width=35, show="*", font=("Arial", 13))
 
         for label, entry in [("Correo electrónico", self.email_entry), ("Contraseña", self.password_entry)]:
-            tk.Label(self, text=label).pack()
-            entry.pack()
+            tk.Label(container, text=label, font=("Arial", 12), bg="#f0f0f0").pack(anchor="w")
+            entry.pack(pady=5)
 
-        tk.Button(self, text="Iniciar sesión", command=self.iniciar_sesion).pack(pady=10)
-        tk.Button(self, text="Registrarse", command=self.abrir_registro).pack()
+        ctk.CTkButton(container, text="Iniciar sesión", command=self.iniciar_sesion, width=200).pack(pady=(20, 10))
+        ctk.CTkButton(container, text="Registrarse", command=self.abrir_registro, width=200, fg_color="#cccccc", text_color="black").pack()
 
     def iniciar_sesion(self):
         email = self.email_entry.get()
