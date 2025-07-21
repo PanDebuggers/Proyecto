@@ -1,6 +1,13 @@
-import sqlite3
+import sys
 import os
+# Forzar sys.path para que apunte a la carpeta donde está 'app'
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "MediCareDesk")))
+
+import sqlite3
 from datetime import datetime, timedelta
+
+# Importar la lógica de tratamientos usando el path original
+from app.logic import tratamientos as logic_tratamientos
 
 # Ruta a tu DB
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -10,15 +17,18 @@ conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
 
 try:
-    # Insertar 2 cuidadores
+    # Insertar 2 cuidadores solo si no existen
     cuidadores = [
         ("Ana Pérez", "Hija", "3214567890", "ana@example.com", "hash123"),
         ("Luis Gómez", "Nieto", "9876543210", "luis@example.com", "hash456")
     ]
-    cursor.executemany("""
-        INSERT INTO Cuidador (nombre, relacion, contacto, email, password_hash)
-        VALUES (?, ?, ?, ?, ?)
-    """, cuidadores)
+    for nombre, relacion, contacto, email, password_hash in cuidadores:
+        cursor.execute("SELECT 1 FROM Cuidador WHERE email = ?", (email,))
+        if not cursor.fetchone():
+            cursor.execute("""
+                INSERT INTO Cuidador (nombre, relacion, contacto, email, password_hash)
+                VALUES (?, ?, ?, ?, ?)
+            """, (nombre, relacion, contacto, email, password_hash))
 
     # Obtener sus IDs
     cursor.execute("SELECT id_cuidador FROM Cuidador WHERE email = ?", ("ana@example.com",))
@@ -103,6 +113,14 @@ try:
             "activo",
             "08:00"
         ))
+        asignacion_id = cursor.lastrowid
+        # Hacer commit antes de llamar a la lógica de generación de tomas
+        conn.commit()
+        # Generar tomas programadas usando la lógica de la app
+        try:
+            logic_tratamientos.generar_tomas_tratamiento(asignacion_id)
+        except Exception as e:
+            print(f"[ADVERTENCIA] No se pudieron generar tomas para asignacion_id={asignacion_id}: {e}")
 
     conn.commit()
     print("✅ Datos de prueba insertados correctamente.")

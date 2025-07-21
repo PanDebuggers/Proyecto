@@ -23,6 +23,14 @@ def mostrar_tratamientos(frame_dinamico):
     ctk.CTkLabel(filtro_frame, text="Filtrar por paciente:").pack(side="left", padx=5)
     pacientes = modelos.obtener_pacientes()
     pacientes_nombres = [f"{p['id_paciente']} - {p['nombre']}" for p in pacientes]
+    # Crear un diccionario paciente_id -> cuidador (responsable)
+    cuidadores_cache = {}
+    for p in pacientes:
+        id_cuidador = p.get('id_cuidador')
+        if id_cuidador and id_cuidador not in cuidadores_cache:
+            cuidador = modelos.buscar_cuidador_por_id(id_cuidador) if hasattr(modelos, 'buscar_cuidador_por_id') else None
+            if cuidador:
+                cuidadores_cache[id_cuidador] = cuidador['nombre']
     ctk.CTkOptionMenu(filtro_frame, values=["Todos"]+pacientes_nombres, variable=filtro_paciente).pack(side="left", padx=5)
     ctk.CTkLabel(filtro_frame, text="Estado:").pack(side="left", padx=5)
     estados = ['activo', 'suspendido', 'finalizado', 'pendiente']
@@ -64,7 +72,19 @@ def mostrar_tratamientos(frame_dinamico):
                 continue
             if texto_filtro and texto_filtro not in t['nombre_tratamiento'].lower():
                 continue
-            tabla.insert("", "end", values=(t['id_tratamiento'], nombre_paciente, p['edad'], t['nombre_tratamiento'], t.get('descripcion',''), t['fecha_inicio'], t['fecha_fin'], t['estado'], p.get('contacto','')))
+            # Buscar nombre del cuidador/responsable
+            nombre_responsable = None
+            id_cuidador = p.get('id_cuidador')
+            if id_cuidador:
+                if id_cuidador in cuidadores_cache:
+                    nombre_responsable = cuidadores_cache[id_cuidador]
+                else:
+                    # Fallback: buscar por función si no está en cache
+                    cuidador = modelos.buscar_cuidador_por_id(id_cuidador) if hasattr(modelos, 'buscar_cuidador_por_id') else None
+                    if cuidador:
+                        nombre_responsable = cuidador['nombre']
+                        cuidadores_cache[id_cuidador] = nombre_responsable
+            tabla.insert("", "end", values=(t['id_tratamiento'], nombre_paciente, p['edad'], t['nombre_tratamiento'], t.get('descripcion',''), t['fecha_inicio'], t['fecha_fin'], t['estado'], nombre_responsable or ""))
 
     filtro_paciente.trace_add('write', lambda *a: cargar_tabla())
     filtro_estado.trace_add('write', lambda *a: cargar_tabla())
@@ -211,18 +231,23 @@ def mostrar_tratamientos(frame_dinamico):
         ctk.CTkOptionMenu(frame, values=estado_opciones, variable=estado_var).grid(row=row, column=1, sticky="ew", pady=5)
         row+=1
 
+
         def guardar():
             try:
                 nombre_medicamento = medicamento_var.get()
                 id_medicamento = medicamentos_dict.get(nombre_medicamento)
+                # Obtener fechas del tratamiento asociado
+                tratamiento = modelos.obtener_tratamiento(id_tratamiento)
+                fecha_inicio = tratamiento['fecha_inicio']
+                fecha_fin = tratamiento['fecha_fin']
                 datos = {
                     'id_tratamiento': id_tratamiento,
                     'id_medicamento': id_medicamento,
                     'dosis': dosis_var.get(),
                     'frecuencia': frecuencia_var.get(),
                     'via_administracion': via_var.get(),
-                    'fecha_inicio': None,
-                    'fecha_fin': None,
+                    'fecha_inicio': fecha_inicio,
+                    'fecha_fin': fecha_fin,
                     'estado': estado_var.get()
                 }
                 from app.logic import tratamientos as logic_tratamientos

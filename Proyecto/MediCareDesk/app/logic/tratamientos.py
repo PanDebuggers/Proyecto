@@ -1,3 +1,47 @@
+# Generar tomas programadas para un tratamiento-medicamento
+def generar_tomas_tratamiento(asignacion_id):
+    '''
+    Genera las tomas programadas para el tratamiento-medicamento asignado,
+    según la frecuencia y el rango de fechas.
+    '''
+    from app.db import modelos
+    import datetime
+    asignacion = modelos.obtener_tratamiento_medicamento(asignacion_id)
+    print(f"[DEBUG] Asignación recuperada: {asignacion}")
+    if not asignacion:
+        print("[DEBUG] No se encontró la asignación.")
+        return
+    fecha_inicio = asignacion['fecha_inicio']
+    fecha_fin = asignacion['fecha_fin']
+    frecuencia = asignacion['frecuencia']
+    hora_base = '08:00'  # Hora base por defecto
+    if not fecha_inicio or not fecha_fin:
+        print(f"[DEBUG] Fechas inválidas: inicio={fecha_inicio}, fin={fecha_fin}")
+        return
+    fecha_ini = datetime.datetime.strptime(fecha_inicio, '%Y-%m-%d')
+    fecha_fin_dt = datetime.datetime.strptime(fecha_fin, '%Y-%m-%d')
+    dias = (fecha_fin_dt - fecha_ini).days + 1
+    print(f"[DEBUG] Generando tomas para {dias} días, frecuencia: {frecuencia}")
+    for i in range(dias):
+        fecha = (fecha_ini + datetime.timedelta(days=i)).strftime('%Y-%m-%d')
+        if frecuencia == 'una_vez_al_dia':
+            horas = [hora_base]
+        elif frecuencia == 'cada_8_horas':
+            horas = ['08:00', '16:00', '00:00']
+        elif frecuencia == 'cada_12_horas':
+            horas = ['08:00', '20:00']
+        elif frecuencia == 'cada_24_horas':
+            horas = [hora_base]
+        else:
+            horas = [hora_base]
+        for hora in horas:
+            print(f"[DEBUG] Creando toma para fecha={fecha}, hora={hora}")
+            modelos.crear_toma({
+                'id_tratamiento_medicamento': asignacion_id,
+                'fecha': fecha,
+                'hora_programada': hora,
+                'estado': 'programada'
+            })
 from datetime import datetime, timedelta
 from app.db import modelos
 import re

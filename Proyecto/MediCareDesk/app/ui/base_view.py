@@ -62,5 +62,42 @@ def iniciar_aplicacion(email, root):
     menu_lateral.btn_pacientes.configure(command=lambda: mostrar_pacientes(frame_dinamico, id_cuidador))
     menu_lateral.btn_medicamentos.configure(command=lambda: mostrar_medicamentos(frame_dinamico))
     menu_lateral.btn_tratamientos.configure(command=lambda: mostrar_tratamientos(frame_dinamico))
+    menu_lateral.btn_tomas_dia.configure(command=lambda: __mostrar_tomas_dia(frame_dinamico, id_cuidador))
+    menu_lateral.btn_historial_tomas.configure(command=lambda: __mostrar_historial_tomas(frame_dinamico, id_cuidador))
+    menu_lateral.btn_alertas.configure(command=lambda: __mostrar_alertas(frame_dinamico, id_cuidador))
     menu_lateral.btn_logout.configure(command=lambda: mostrar_login(root))
+
+# Funciones para vistas de tomas y alertas
+def __mostrar_tomas_dia(frame, id_cuidador):
+    from app.ui.tomas import mostrar_tomas_dia
+    mostrar_tomas_dia(frame, id_cuidador)
+
+def __mostrar_historial_tomas(frame, id_cuidador):
+    from app.ui.historial_tomas import mostrar_historial_tomas
+    from app.db import modelos
+    pacientes = modelos.obtener_pacientes()
+    pacientes_cuidador = [p for p in pacientes if p["id_cuidador"] == id_cuidador]
+    if not pacientes_cuidador:
+        tk.Label(frame, text="No hay pacientes registrados.", bg="#f0f0f0", fg="gray").pack(pady=20)
+        return
+    def seleccionar_paciente():
+        seleccion = lista.curselection()
+        if not seleccion:
+            return
+        idx = seleccion[0]
+        paciente = pacientes_cuidador[idx]
+        mostrar_historial_tomas(frame, paciente["id_paciente"], paciente["nombre"])
+    for widget in frame.winfo_children():
+        widget.destroy()
+    tk.Label(frame, text="Seleccione un paciente:", font=("Arial", 14), bg="#f0f0f0").pack(pady=10)
+    lista = tk.Listbox(frame, font=("Arial", 12), height=8)
+    for p in pacientes_cuidador:
+        lista.insert(tk.END, p["nombre"])
+    lista.pack(pady=10)
+    btn = tk.Button(frame, text="Ver historial", command=seleccionar_paciente)
+    btn.pack(pady=5)
+
+def __mostrar_alertas(frame, id_cuidador):
+    from app.ui.alertas import mostrar_alertas
+    mostrar_alertas(frame, id_cuidador)
 
