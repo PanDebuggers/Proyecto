@@ -149,12 +149,12 @@ def mostrar_formulario_tratamiento(parent_frame, tabla, pacientes_nombres, estad
     win = tk.Toplevel(parent_frame.winfo_toplevel())
     win.title("Agregar tratamiento")
     win.geometry("500x600")
-    win.overrideredirect(False)
+
     win.attributes('-topmost', True)
-    win.transient(parent_frame.winfo_toplevel())
+    win.update_idletasks()
     win.lift()
-    win.focus_set()
-    
+    win.focus_force()
+    win.lift()        
     # Agregar a la lista
     open_dialogs.append(win)
     
@@ -292,11 +292,11 @@ def mostrar_formulario_medicamento(parent_frame, tabla, cargar_tabla_callback):
     win.title("Asignar medicamento")
     win.geometry("500x500")
 
-    win.overrideredirect(False)
     win.attributes('-topmost', True)
-    win.transient(parent_frame.winfo_toplevel())
+    win.update_idletasks()
     win.lift()
-    win.focus_set()
+    win.focus_force()
+    win.lift()
     
     open_dialogs.append(win)
     
