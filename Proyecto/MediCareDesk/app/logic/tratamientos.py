@@ -70,14 +70,17 @@ def asignar_medicamento_a_tratamiento(**kwargs):
     kwargs.setdefault('fecha_fin', tratamiento['fecha_fin'])
 
     # Validar fechas si se proporcionan
-    if 'fecha_inicio' in kwargs and 'fecha_fin' in kwargs:
+    if 'fecha_inicio' in kwargs and kwargs['fecha_inicio'] is not None:
         try:
-            fecha_inicio = datetime.strptime(kwargs['fecha_inicio'], '%Y-%m-%d')
-            fecha_fin = datetime.strptime(kwargs['fecha_fin'], '%Y-%m-%d')
+            kwargs['fecha_inicio'] = datetime.strptime(kwargs['fecha_inicio'], '%Y-%m-%d')
         except ValueError:
-            raise ValueError("Formato de fecha inválido")
-        if fecha_fin < fecha_inicio:
-            raise ValueError("La fecha de fin no puede ser anterior a la fecha de inicio")
+            raise ValueError("Formato de fecha_inicio inválido. Use YYYY-MM-DD")
+
+    if 'fecha_fin' in kwargs and kwargs['fecha_fin'] is not None:
+        try:
+            kwargs['fecha_fin'] = datetime.strptime(kwargs['fecha_fin'], '%Y-%m-%d')
+        except ValueError:
+            raise ValueError("Formato de fecha_fin inválido. Use YYYY-MM-DD")
 
     # Eliminar toda lógica de hora_preferida
     if 'hora_preferida' in kwargs:
