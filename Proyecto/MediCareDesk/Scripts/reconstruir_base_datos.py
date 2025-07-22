@@ -9,7 +9,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SQL_FILE = os.path.join(BASE_DIR, "..", "MediCareDesk_SQLite.sql")
 DB_PATH = os.path.join(BASE_DIR, "..", "data", "MediCareDesk.db")
 
-confirm = input("⚠️ Esto eliminará TODA la base de datos y la reconstruirá. Escribe REINICIAR para continuar: ")
+confirm = input(
+    "⚠️ Esto eliminará TODA la base de datos y la reconstruirá. Escribe REINICIAR para continuar: "
+)
 if confirm.upper() != "REINICIAR":
     exit("❌ Operación cancelada.")
 

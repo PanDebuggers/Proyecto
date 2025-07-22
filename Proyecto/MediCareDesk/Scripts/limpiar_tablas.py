@@ -15,10 +15,10 @@ tablas = [
     "Evento",
     "Tratamiento_Medicamento",
     "Tratamiento",
-    "Cuidador_Paciente",   # 🔑 Ahora se limpia la tabla intermedia N:N
+    "Cuidador_Paciente",  # 🔑 Ahora se limpia la tabla intermedia N:N
     "Paciente",
     "Medicamento",
-    "Cuidador"
+    "Cuidador",
 ]
 
 conn = sqlite3.connect(DB_PATH)

@@ -7,19 +7,30 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
+
 def mostrar_pacientes(frame_dinamico, id_cuidador):
     # Limpiar frame dinámico
     for widget in frame_dinamico.winfo_children():
         widget.destroy()
 
-    lbl = tk.Label(frame_dinamico, text="Listado de Pacientes", font=("Helvetica", 16, "bold"), bg="#f0f0f0")
+    lbl = tk.Label(
+        frame_dinamico,
+        text="Listado de Pacientes",
+        font=("Helvetica", 16, "bold"),
+        bg="#f0f0f0",
+    )
     lbl.pack(pady=(10, 20))
 
     # Crear tabla Treeview
     columnas = (
-        "ID", "Nombre", "Edad", "Género",
-        "Contacto Emergencia", "Activo",
-        "Tratamientos Totales", "Tratamientos Activos"
+        "ID",
+        "Nombre",
+        "Edad",
+        "Género",
+        "Contacto Emergencia",
+        "Activo",
+        "Tratamientos Totales",
+        "Tratamientos Activos",
     )
 
     tree = ttk.Treeview(frame_dinamico, columns=columnas, show="headings")
@@ -40,14 +51,17 @@ def mostrar_pacientes(frame_dinamico, id_cuidador):
             conn = sqlite3.connect(DB_FILENAME)
             cursor = conn.cursor()
             # Filtrar por cuidador actual
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT 
                     id_paciente, nombre, edad, genero,
                     contacto_emergencia, activo,
                     tratamientos_totales, tratamientos_activos
                 FROM Vista_Pacientes
                 WHERE id_cuidador = ?
-            """, (id_cuidador,))
+            """,
+                (id_cuidador,),
+            )
             filas = cursor.fetchall()
             for fila in filas:
                 tree.insert("", "end", values=fila)
@@ -95,22 +109,30 @@ def mostrar_pacientes(frame_dinamico, id_cuidador):
                 conn = sqlite3.connect(DB_FILENAME)
                 cursor = conn.cursor()
 
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT INTO Paciente (nombre, edad, genero, contacto_emergencia, observaciones)
                     VALUES (?, ?, ?, ?, ?)
-                    """, (nombre, edad, genero, contacto, observaciones))
+                    """,
+                    (nombre, edad, genero, contacto, observaciones),
+                )
 
                 id_paciente = cursor.lastrowid
 
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT INTO Cuidador_Paciente (id_cuidador, id_paciente)
                     VALUES (?, ?)
-                """, (id_cuidador, id_paciente))
+                """,
+                    (id_cuidador, id_paciente),
+                )
 
                 conn.commit()
                 conn.close()
 
-                tk.messagebox.showinfo("Éxito", "Paciente agregado y asignado correctamente.")
+                tk.messagebox.showinfo(
+                    "Éxito", "Paciente agregado y asignado correctamente."
+                )
                 form.destroy()
                 cargar_datos()
             except sqlite3.Error as e:
@@ -121,7 +143,9 @@ def mostrar_pacientes(frame_dinamico, id_cuidador):
     def eliminar_paciente():
         selected_item = tree.selection()
         if not selected_item:
-            tk.messagebox.showwarning("Advertencia", "Seleccione un paciente para eliminar.")
+            tk.messagebox.showwarning(
+                "Advertencia", "Seleccione un paciente para eliminar."
+            )
             return
 
         paciente_id = tree.item(selected_item, "values")[0]
@@ -130,18 +154,26 @@ def mostrar_pacientes(frame_dinamico, id_cuidador):
             cursor = conn.cursor()
 
             # ⚠️ Eliminar relación en tabla intermedia:
-            cursor.execute("""
+            cursor.execute(
+                """
                 DELETE FROM Cuidador_Paciente WHERE id_cuidador = ? AND id_paciente = ?
-            """, (id_cuidador, paciente_id))
+            """,
+                (id_cuidador, paciente_id),
+            )
 
             # Opcional: si quieres borrar COMPLETAMENTE el paciente (solo si no tiene otros cuidadores):
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT COUNT(*) FROM Cuidador_Paciente WHERE id_paciente = ?
-            """, (paciente_id,))
+            """,
+                (paciente_id,),
+            )
             vinculaciones = cursor.fetchone()[0]
 
             if vinculaciones == 0:
-                cursor.execute("DELETE FROM Paciente WHERE id_paciente = ?", (paciente_id,))
+                cursor.execute(
+                    "DELETE FROM Paciente WHERE id_paciente = ?", (paciente_id,)
+                )
 
             conn.commit()
             conn.close()
@@ -154,10 +186,14 @@ def mostrar_pacientes(frame_dinamico, id_cuidador):
     btn_frame = tk.Frame(frame_dinamico, bg="#f0f0f0")
     btn_frame.pack(pady=10)
 
-    agregar_btn = ctk.CTkButton(btn_frame, text="Agregar Paciente", command=agregar_paciente)
+    agregar_btn = ctk.CTkButton(
+        btn_frame, text="Agregar Paciente", command=agregar_paciente
+    )
     agregar_btn.pack(side=tk.LEFT, padx=10)
 
-    eliminar_btn = ctk.CTkButton(btn_frame, text="Eliminar Paciente", command=eliminar_paciente)
+    eliminar_btn = ctk.CTkButton(
+        btn_frame, text="Eliminar Paciente", command=eliminar_paciente
+    )
     eliminar_btn.pack(side=tk.LEFT, padx=10)
 
     cargar_datos()

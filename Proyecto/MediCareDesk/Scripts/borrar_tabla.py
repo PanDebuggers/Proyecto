@@ -6,7 +6,9 @@ import sqlite3
 tabla = "NombreTabla"  # ← Reemplaza este valor por el nombre de la tabla a limpiar
 DB_PATH = "data/MediCareDesk.db"
 
-confirm = input(f"⚠️ ¿Seguro que deseas vaciar la tabla '{tabla}'? Escribe SÍ para continuar: ")
+confirm = input(
+    f"⚠️ ¿Seguro que deseas vaciar la tabla '{tabla}'? Escribe SÍ para continuar: "
+)
 if confirm != "SÍ":
     exit("❌ Operación cancelada.")
 

@@ -7,6 +7,7 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
+
 def mostrar_medicamentos(frame_dinamico):
     # Limpiar frame dinámico
     for widget in frame_dinamico.winfo_children():
@@ -22,10 +23,7 @@ def mostrar_medicamentos(frame_dinamico):
     scrollable_frame = tk.Frame(canvas, bg="#f0f0f0")
 
     scrollable_frame.bind(
-        "<Configure>",
-        lambda e: canvas.configure(
-            scrollregion=canvas.bbox("all")
-        )
+        "<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
     )
 
     canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
@@ -35,22 +33,33 @@ def mostrar_medicamentos(frame_dinamico):
     scrollbar.pack(side="right", fill="y")
 
     # Título
-    lbl = tk.Label(scrollable_frame, text="Gestión de Medicamentos", 
-                  font=("Helvetica", 16, "bold"), bg="#f0f0f0")
+    lbl = tk.Label(
+        scrollable_frame,
+        text="Gestión de Medicamentos",
+        font=("Helvetica", 16, "bold"),
+        bg="#f0f0f0",
+    )
     lbl.pack(pady=(10, 20))
 
     # Crear tabla Treeview con estilo mejorado
     style = ttk.Style()
     style.configure("Treeview", rowheight=25)
-    style.configure("Treeview.Heading", font=('Helvetica', 10, 'bold'))
+    style.configure("Treeview.Heading", font=("Helvetica", 10, "bold"))
 
     columnas = (
-        "ID", "Nombre", "Principio Activo", "Presentación",
-        "Laboratorio", "Caducidad", "Registro"
+        "ID",
+        "Nombre",
+        "Principio Activo",
+        "Presentación",
+        "Laboratorio",
+        "Caducidad",
+        "Registro",
     )
 
-    tree = ttk.Treeview(scrollable_frame, columns=columnas, show="headings", selectmode="browse")
-    
+    tree = ttk.Treeview(
+        scrollable_frame, columns=columnas, show="headings", selectmode="browse"
+    )
+
     # Configurar columnas
     tree.column("ID", width=50, anchor="center")
     tree.column("Nombre", width=150, anchor="w")
@@ -67,7 +76,7 @@ def mostrar_medicamentos(frame_dinamico):
 
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     DB_FILENAME = os.path.join(BASE_DIR, "..", "..", "data", "MediCareDesk.db")
-    
+
     # Función para cargar datos
     def cargar_datos():
         for row in tree.get_children():
@@ -75,18 +84,20 @@ def mostrar_medicamentos(frame_dinamico):
         try:
             conn = sqlite3.connect(DB_FILENAME)
             cursor = conn.cursor()
-            
-            cursor.execute("""
+
+            cursor.execute(
+                """
                 SELECT 
                     id_medicamento, nombre, principio_activo,
                     presentacion, laboratorio,
                     fecha_caducidad, fecha_registro
                 FROM Medicamento
                 ORDER BY nombre
-            """)
-            
+            """
+            )
+
             filas = cursor.fetchall()
-            
+
             # Insertar datos con etiquetas alternas
             for i, fila in enumerate(filas):
                 # Formatear fecha de caducidad
@@ -94,25 +105,27 @@ def mostrar_medicamentos(frame_dinamico):
                     fecha_cad = fila[5].split()[0]  # Solo fecha sin hora
                 else:
                     fecha_cad = "N/A"
-                
+
                 # Formatear fecha de registro
                 fecha_reg = fila[6].split()[0] if fila[6] else "N/A"
-                
+
                 # Crear nueva tupla con fechas formateadas
                 fila_formateada = fila[:5] + (fecha_cad, fecha_reg)
-                
-                tags = ('evenrow',) if i % 2 == 0 else ('oddrow',)
+
+                tags = ("evenrow",) if i % 2 == 0 else ("oddrow",)
                 tree.insert("", "end", values=fila_formateada, tags=tags)
-                
+
             conn.close()
-            
+
             # Configurar colores alternos
-            tree.tag_configure('evenrow', background='#ffffff')
-            tree.tag_configure('oddrow', background='#f5f5f5')
-            
+            tree.tag_configure("evenrow", background="#ffffff")
+            tree.tag_configure("oddrow", background="#f5f5f5")
+
         except sqlite3.Error as e:
-            tk.messagebox.showerror("Error de Base de Datos", 
-                                  f"No se pudieron cargar los medicamentos:\n{str(e)}")
+            tk.messagebox.showerror(
+                "Error de Base de Datos",
+                f"No se pudieron cargar los medicamentos:\n{str(e)}",
+            )
 
     # Función para agregar medicamento
     def agregar_medicamento():
@@ -128,32 +141,48 @@ def mostrar_medicamentos(frame_dinamico):
             ("Laboratorio:", ""),
             ("Fecha Caducidad (YYYY-MM-DD):", ""),
             ("Indicaciones:", ""),
-            ("Contraindicaciones:", "")
+            ("Contraindicaciones:", ""),
         ]
 
         entries = []
         for i, (label, default) in enumerate(campos[:5]):  # Los primeros 5 son Entry
-            tk.Label(form, text=label).grid(row=i, column=0, padx=10, pady=5, sticky="e")
+            tk.Label(form, text=label).grid(
+                row=i, column=0, padx=10, pady=5, sticky="e"
+            )
             entry = tk.Entry(form)
             entry.grid(row=i, column=1, padx=10, pady=5, sticky="we")
             entry.insert(0, default)
             entries.append(entry)
 
         # Menú desplegable para presentación
-        presentaciones = ['Comprimidas', 'Jarabe', 'Crema', 'Solución inyectable', 'otros']
+        presentaciones = [
+            "Comprimidas",
+            "Jarabe",
+            "Crema",
+            "Solución inyectable",
+            "otros",
+        ]
         entries[2].destroy()  # Eliminar el Entry existente
         presentacion_var = tk.StringVar(value=presentaciones[0])
-        tk.Label(form, text="Presentación:").grid(row=2, column=0, padx=10, pady=5, sticky="e")
-        presentacion_menu = ttk.Combobox(form, textvariable=presentacion_var, values=presentaciones, state="readonly")
+        tk.Label(form, text="Presentación:").grid(
+            row=2, column=0, padx=10, pady=5, sticky="e"
+        )
+        presentacion_menu = ttk.Combobox(
+            form, textvariable=presentacion_var, values=presentaciones, state="readonly"
+        )
         presentacion_menu.grid(row=2, column=1, padx=10, pady=5, sticky="we")
         entries[2] = presentacion_var
 
         # Áreas de texto para indicaciones y contraindicaciones
-        tk.Label(form, text=campos[5][0]).grid(row=5, column=0, padx=10, pady=5, sticky="ne")
+        tk.Label(form, text=campos[5][0]).grid(
+            row=5, column=0, padx=10, pady=5, sticky="ne"
+        )
         indicaciones_entry = tk.Text(form, height=5, width=30)
         indicaciones_entry.grid(row=5, column=1, padx=10, pady=5, sticky="we")
 
-        tk.Label(form, text=campos[6][0]).grid(row=6, column=0, padx=10, pady=5, sticky="ne")
+        tk.Label(form, text=campos[6][0]).grid(
+            row=6, column=0, padx=10, pady=5, sticky="ne"
+        )
         contraindicaciones_entry = tk.Text(form, height=5, width=30)
         contraindicaciones_entry.grid(row=6, column=1, padx=10, pady=5, sticky="we")
 
@@ -169,43 +198,59 @@ def mostrar_medicamentos(frame_dinamico):
 
             # Validaciones básicas
             if not nombre:
-                tk.messagebox.showerror("Error", "El nombre del medicamento es obligatorio")
+                tk.messagebox.showerror(
+                    "Error", "El nombre del medicamento es obligatorio"
+                )
                 return
 
             try:
                 conn = sqlite3.connect(DB_FILENAME)
                 cursor = conn.cursor()
-                
-                cursor.execute("""
+
+                cursor.execute(
+                    """
                     INSERT INTO Medicamento (
                         nombre, principio_activo, presentacion,
                         laboratorio, fecha_caducidad,
                         indicaciones, contraindicaciones
                     ) VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    nombre, principio_activo, presentacion,
-                    laboratorio, fecha_caducidad,
-                    indicaciones, contraindicaciones
-                ))
-                
+                """,
+                    (
+                        nombre,
+                        principio_activo,
+                        presentacion,
+                        laboratorio,
+                        fecha_caducidad,
+                        indicaciones,
+                        contraindicaciones,
+                    ),
+                )
+
                 conn.commit()
                 conn.close()
-                
+
                 tk.messagebox.showinfo("Éxito", "Medicamento agregado correctamente")
                 form.destroy()
                 cargar_datos()
-                
-            except sqlite3.Error as e:
-                tk.messagebox.showerror("Error", f"No se pudo agregar el medicamento:\n{str(e)}")
 
-        btn_guardar = ctk.CTkButton(form, text="Guardar Medicamento", command=guardar_medicamento)
+            except sqlite3.Error as e:
+                tk.messagebox.showerror(
+                    "Error", f"No se pudo agregar el medicamento:\n{str(e)}"
+                )
+
+        btn_guardar = ctk.CTkButton(
+            form, text="Guardar Medicamento", command=guardar_medicamento
+        )
         btn_guardar.grid(row=7, column=1, pady=10, sticky="e")
 
     # Función para editar medicamento
     def editar_medicamento():
         selected_item = tree.selection()
         if not selected_item:
-            tk.messagebox.showwarning("Selección requerida", "Por favor seleccione un medicamento para editar.")
+            tk.messagebox.showwarning(
+                "Selección requerida",
+                "Por favor seleccione un medicamento para editar.",
+            )
             return
 
         medicamento_data = tree.item(selected_item, "values")
@@ -215,11 +260,15 @@ def mostrar_medicamentos(frame_dinamico):
         try:
             conn = sqlite3.connect(DB_FILENAME)
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM Medicamento WHERE id_medicamento = ?", (medicamento_id,))
+            cursor.execute(
+                "SELECT * FROM Medicamento WHERE id_medicamento = ?", (medicamento_id,)
+            )
             medicamento = cursor.fetchone()
             conn.close()
         except sqlite3.Error as e:
-            tk.messagebox.showerror("Error", f"No se pudo obtener los datos del medicamento:\n{str(e)}")
+            tk.messagebox.showerror(
+                "Error", f"No se pudo obtener los datos del medicamento:\n{str(e)}"
+            )
             return
 
         form = tk.Toplevel()
@@ -234,33 +283,49 @@ def mostrar_medicamentos(frame_dinamico):
             ("Laboratorio:", medicamento[7]),  # laboratorio
             ("Fecha Caducidad (YYYY-MM-DD):", medicamento[4] or ""),  # fecha_caducidad
             ("Indicaciones:", medicamento[3] or ""),  # indicaciones
-            ("Contraindicaciones:", medicamento[5] or "")  # contraindicaciones
+            ("Contraindicaciones:", medicamento[5] or ""),  # contraindicaciones
         ]
 
         entries = []
         for i, (label, default) in enumerate(campos[:5]):  # Los primeros 5 son Entry
-            tk.Label(form, text=label).grid(row=i, column=0, padx=10, pady=5, sticky="e")
+            tk.Label(form, text=label).grid(
+                row=i, column=0, padx=10, pady=5, sticky="e"
+            )
             entry = tk.Entry(form)
             entry.grid(row=i, column=1, padx=10, pady=5, sticky="we")
             entry.insert(0, default)
             entries.append(entry)
 
         # Menú desplegable para presentación
-        presentaciones = ['Comprimidas', 'Jarabe', 'Crema', 'Solución inyectable', 'otros']
+        presentaciones = [
+            "Comprimidas",
+            "Jarabe",
+            "Crema",
+            "Solución inyectable",
+            "otros",
+        ]
         entries[2].destroy()  # Eliminar el Entry existente
         presentacion_var = tk.StringVar(value=medicamento[6])
-        tk.Label(form, text="Presentación:").grid(row=2, column=0, padx=10, pady=5, sticky="e")
-        presentacion_menu = ttk.Combobox(form, textvariable=presentacion_var, values=presentaciones, state="readonly")
+        tk.Label(form, text="Presentación:").grid(
+            row=2, column=0, padx=10, pady=5, sticky="e"
+        )
+        presentacion_menu = ttk.Combobox(
+            form, textvariable=presentacion_var, values=presentaciones, state="readonly"
+        )
         presentacion_menu.grid(row=2, column=1, padx=10, pady=5, sticky="we")
         entries[2] = presentacion_var
 
         # Áreas de texto para indicaciones y contraindicaciones
-        tk.Label(form, text=campos[5][0]).grid(row=5, column=0, padx=10, pady=5, sticky="ne")
+        tk.Label(form, text=campos[5][0]).grid(
+            row=5, column=0, padx=10, pady=5, sticky="ne"
+        )
         indicaciones_entry = tk.Text(form, height=5, width=30)
         indicaciones_entry.grid(row=5, column=1, padx=10, pady=5, sticky="we")
         indicaciones_entry.insert("1.0", campos[5][1])
 
-        tk.Label(form, text=campos[6][0]).grid(row=6, column=0, padx=10, pady=5, sticky="ne")
+        tk.Label(form, text=campos[6][0]).grid(
+            row=6, column=0, padx=10, pady=5, sticky="ne"
+        )
         contraindicaciones_entry = tk.Text(form, height=5, width=30)
         contraindicaciones_entry.grid(row=6, column=1, padx=10, pady=5, sticky="we")
         contraindicaciones_entry.insert("1.0", campos[6][1])
@@ -277,14 +342,17 @@ def mostrar_medicamentos(frame_dinamico):
 
             # Validaciones básicas
             if not nombre:
-                tk.messagebox.showerror("Error", "El nombre del medicamento es obligatorio")
+                tk.messagebox.showerror(
+                    "Error", "El nombre del medicamento es obligatorio"
+                )
                 return
 
             try:
                 conn = sqlite3.connect(DB_FILENAME)
                 cursor = conn.cursor()
-                
-                cursor.execute("""
+
+                cursor.execute(
+                    """
                     UPDATE Medicamento SET
                         nombre = ?,
                         principio_activo = ?,
@@ -294,31 +362,44 @@ def mostrar_medicamentos(frame_dinamico):
                         indicaciones = ?,
                         contraindicaciones = ?
                     WHERE id_medicamento = ?
-                """, (
-                    nombre, principio_activo, presentacion,
-                    laboratorio, fecha_caducidad,
-                    indicaciones, contraindicaciones,
-                    medicamento_id
-                ))
-                
+                """,
+                    (
+                        nombre,
+                        principio_activo,
+                        presentacion,
+                        laboratorio,
+                        fecha_caducidad,
+                        indicaciones,
+                        contraindicaciones,
+                        medicamento_id,
+                    ),
+                )
+
                 conn.commit()
                 conn.close()
-                
+
                 tk.messagebox.showinfo("Éxito", "Medicamento actualizado correctamente")
                 form.destroy()
                 cargar_datos()
-                
-            except sqlite3.Error as e:
-                tk.messagebox.showerror("Error", f"No se pudo actualizar el medicamento:\n{str(e)}")
 
-        btn_guardar = ctk.CTkButton(form, text="Guardar Cambios", command=actualizar_medicamento)
+            except sqlite3.Error as e:
+                tk.messagebox.showerror(
+                    "Error", f"No se pudo actualizar el medicamento:\n{str(e)}"
+                )
+
+        btn_guardar = ctk.CTkButton(
+            form, text="Guardar Cambios", command=actualizar_medicamento
+        )
         btn_guardar.grid(row=7, column=1, pady=10, sticky="e")
 
     # Función para eliminar medicamento
     def eliminar_medicamento():
         selected_item = tree.selection()
         if not selected_item:
-            tk.messagebox.showwarning("Selección requerida", "Por favor seleccione un medicamento para eliminar.")
+            tk.messagebox.showwarning(
+                "Selección requerida",
+                "Por favor seleccione un medicamento para eliminar.",
+            )
             return
 
         medicamento_id = tree.item(selected_item, "values")[0]
@@ -328,56 +409,72 @@ def mostrar_medicamentos(frame_dinamico):
         confirmar = tk.messagebox.askyesno(
             "Confirmar Eliminación",
             f"¿Está seguro que desea eliminar el medicamento '{medicamento_nombre}' (ID: {medicamento_id})?\n\n"
-            "Nota: Esta acción no se puede deshacer."
+            "Nota: Esta acción no se puede deshacer.",
         )
-        
+
         if not confirmar:
             return
 
         try:
             conn = sqlite3.connect(DB_FILENAME)
             cursor = conn.cursor()
-            
+
             # Verificar si el medicamento está en uso
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT COUNT(*) FROM Tratamiento_Medicamento 
                 WHERE id_medicamento = ?
-            """, (medicamento_id,))
-            
+            """,
+                (medicamento_id,),
+            )
+
             en_uso = cursor.fetchone()[0]
-            
+
             if en_uso > 0:
                 tk.messagebox.showwarning(
                     "Medicamento en Uso",
                     f"Este medicamento está asignado a {en_uso} tratamiento(s).\n\n"
-                    "No se puede eliminar mientras esté en uso."
+                    "No se puede eliminar mientras esté en uso.",
                 )
                 return
-            
+
             # Eliminar el medicamento
-            cursor.execute("DELETE FROM Medicamento WHERE id_medicamento = ?", (medicamento_id,))
-            
+            cursor.execute(
+                "DELETE FROM Medicamento WHERE id_medicamento = ?", (medicamento_id,)
+            )
+
             conn.commit()
             conn.close()
-            
+
             tk.messagebox.showinfo("Éxito", "Medicamento eliminado correctamente")
             cargar_datos()
-            
+
         except sqlite3.Error as e:
-            tk.messagebox.showerror("Error", f"No se pudo eliminar el medicamento:\n{str(e)}")
+            tk.messagebox.showerror(
+                "Error", f"No se pudo eliminar el medicamento:\n{str(e)}"
+            )
 
     # Botones de acción
     btn_frame = tk.Frame(scrollable_frame, bg="#f0f0f0")
     btn_frame.pack(pady=10)
 
-    btn_agregar = ctk.CTkButton(btn_frame, text="Agregar Medicamento", command=agregar_medicamento)
+    btn_agregar = ctk.CTkButton(
+        btn_frame, text="Agregar Medicamento", command=agregar_medicamento
+    )
     btn_agregar.pack(side=tk.LEFT, padx=5)
 
-    btn_editar = ctk.CTkButton(btn_frame, text="Editar Medicamento", command=editar_medicamento)
+    btn_editar = ctk.CTkButton(
+        btn_frame, text="Editar Medicamento", command=editar_medicamento
+    )
     btn_editar.pack(side=tk.LEFT, padx=5)
 
-    btn_eliminar = ctk.CTkButton(btn_frame, text="Eliminar Medicamento", command=eliminar_medicamento,
-                                fg_color="#d9534f", hover_color="#c9302c")
+    btn_eliminar = ctk.CTkButton(
+        btn_frame,
+        text="Eliminar Medicamento",
+        command=eliminar_medicamento,
+        fg_color="#d9534f",
+        hover_color="#c9302c",
+    )
     btn_eliminar.pack(side=tk.LEFT, padx=5)
 
     btn_refresh = ctk.CTkButton(btn_frame, text="Refrescar", command=cargar_datos)

@@ -1,15 +1,20 @@
-
 import tkinter as tk
 import customtkinter as ctk
 from tkinter import ttk
 from app.db import modelos
+
 
 def mostrar_alertas_semanales(frame, id_cuidador):
     # Limpiar el frame
     for widget in frame.winfo_children():
         widget.destroy()
 
-    tk.Label(frame, text="Alertas: Próxima toma semanal por paciente", font=("Arial", 18, "bold"), bg="#f0f0f0").pack(pady=10)
+    tk.Label(
+        frame,
+        text="Alertas: Próxima toma semanal por paciente",
+        font=("Arial", 18, "bold"),
+        bg="#f0f0f0",
+    ).pack(pady=10)
 
     columnas = ("Paciente", "Fecha", "Hora", "Medicamento", "Estado")
     tabla = ttk.Treeview(frame, columns=columnas, show="headings", height=10)
@@ -22,23 +27,31 @@ def mostrar_alertas_semanales(frame, id_cuidador):
         "programada": "#FFFACD",
         "tomada": "#C1FFC1",
         "omitida": "#FFB6B6",
-        "pendiente": "#E0E0E0"
+        "pendiente": "#E0E0E0",
     }
 
     tomas = modelos.obtener_proximas_tomas_semanales_por_paciente(id_cuidador)
     for toma in tomas:
         color = estados_colores.get(toma["estado"], "white")
-        tabla.insert("", "end", values=(
-            toma["nombre_paciente"],
-            toma["fecha"],
-            toma["hora_programada"],
-            toma["nombre_medicamento"],
-            toma["estado"].capitalize()
-        ), tags=(toma["estado"],))
+        tabla.insert(
+            "",
+            "end",
+            values=(
+                toma["nombre_paciente"],
+                toma["fecha"],
+                toma["hora_programada"],
+                toma["nombre_medicamento"],
+                toma["estado"].capitalize(),
+            ),
+            tags=(toma["estado"],),
+        )
         tabla.tag_configure(toma["estado"], background=color)
 
     if not tomas:
-        tk.Label(frame, text="No hay próximas tomas programadas para esta semana.", fg="gray").pack(pady=10)
+        tk.Label(
+            frame, text="No hay próximas tomas programadas para esta semana.", fg="gray"
+        ).pack(pady=10)
+
 
 # Alias para compatibilidad con el menú lateral y base_view
 def mostrar_alertas(frame, id_cuidador):

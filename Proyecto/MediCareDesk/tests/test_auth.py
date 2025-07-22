@@ -1,7 +1,8 @@
-#Creado por CatherineHerrera96
+# Creado por CatherineHerrera96
 
 import unittest
 from app.logic.auth import validar_credenciales
+
 
 class TestAuth(unittest.TestCase):
     def test_login_correcto(self):
@@ -16,8 +17,6 @@ class TestAuth(unittest.TestCase):
         """Debe fallar si la contraseña no es correcta."""
         self.assertFalse(validar_credenciales("cathy@example.com", "clave_incorrecta"))
 
+
 if __name__ == "__main__":
     unittest.main()
-
-
-

@@ -1,9 +1,11 @@
 import unittest
 import sys
 import os
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app.db.conexion import obtener_conexion
+
 
 class TestBaseDeDatos(unittest.TestCase):
 
@@ -17,7 +19,15 @@ class TestBaseDeDatos(unittest.TestCase):
         cursor = conn.cursor()
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
         tablas = [tabla["name"] for tabla in cursor.fetchall()]
-        esperadas = ["Paciente", "Cuidador", "Medicamento", "Tratamiento", "Tratamiento_Medicamento", "Toma", "Evento"]
+        esperadas = [
+            "Paciente",
+            "Cuidador",
+            "Medicamento",
+            "Tratamiento",
+            "Tratamiento_Medicamento",
+            "Toma",
+            "Evento",
+        ]
         for tabla in esperadas:
             self.assertIn(tabla, tablas)
         conn.close()
@@ -30,5 +40,6 @@ class TestBaseDeDatos(unittest.TestCase):
         self.assertIn("Vista_Pacientes", vistas)
         conn.close()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

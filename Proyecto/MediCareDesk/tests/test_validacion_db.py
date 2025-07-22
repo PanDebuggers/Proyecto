@@ -1,6 +1,6 @@
 # Creado por CatherineHerrera96
-#Valida que LS lógica de negocio no permita guardar datos inválidos.
-#Este TEST no hace parte de las pruebas unitarias, es Solo para confirmar la adecuada conexion de la base de datos
+# Valida que LS lógica de negocio no permita guardar datos inválidos.
+# Este TEST no hace parte de las pruebas unitarias, es Solo para confirmar la adecuada conexion de la base de datos
 
 import sqlite3
 import os

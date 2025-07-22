@@ -1,6 +1,7 @@
 import unittest
 from app.db import modelos
 
+
 class TestModelosCuidador(unittest.TestCase):
 
     def setUp(self):
@@ -17,7 +18,7 @@ class TestModelosCuidador(unittest.TestCase):
             relacion="Hermano",
             contacto="3011111111",
             email="prueba@correo.com",
-            password_hash="clave123"
+            password_hash="clave123",
         )
         resultado = modelos.buscar_cuidador_por_email("prueba@correo.com")
         self.assertIsNotNone(resultado)
@@ -30,18 +31,23 @@ class TestModelosCuidador(unittest.TestCase):
             relacion="Hermano",
             contacto="3011111111",
             email="prueba@correo.com",
-            password_hash="clave123"
+            password_hash="clave123",
         )
-        resultado = modelos.buscar_cuidador_por_credenciales("prueba@correo.com", "clave123")
+        resultado = modelos.buscar_cuidador_por_credenciales(
+            "prueba@correo.com", "clave123"
+        )
         self.assertIsNotNone(resultado)
         self.assertEqual(resultado[1], "Cuidador Prueba")
 
     def test_buscar_cuidador_por_credenciales_incorrectas(self):
         """Debe retornar None si las credenciales son inválidas."""
-        resultado = modelos.buscar_cuidador_por_credenciales("noexiste@correo.com", "nada")
+        resultado = modelos.buscar_cuidador_por_credenciales(
+            "noexiste@correo.com", "nada"
+        )
         self.assertIsNone(resultado)
+
 
 if __name__ == "__main__":
     unittest.main()
 
-#---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
