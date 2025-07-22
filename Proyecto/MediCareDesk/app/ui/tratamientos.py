@@ -146,9 +146,14 @@ def mostrar_formulario_tratamiento(parent_frame, tabla, pacientes_nombres, estad
     global open_dialogs
     
     # Crear ventana SIN grab_set para evitar el difuminado
-    win = ctk.CTkToplevel(parent_frame.winfo_toplevel())
+    win = tk.Toplevel(parent_frame.winfo_toplevel())
     win.title("Agregar tratamiento")
     win.geometry("500x600")
+    win.overrideredirect(False)
+    win.attributes('-topmost', True)
+    win.transient(parent_frame.winfo_toplevel())
+    win.lift()
+    win.focus_set()
     
     # Agregar a la lista
     open_dialogs.append(win)
@@ -283,9 +288,15 @@ def mostrar_formulario_medicamento(parent_frame, tabla, cargar_tabla_callback):
     id_tratamiento = item['values'][0]
     
     # Crear ventana SIN grab_set para evitar difuminado
-    win = ctk.CTkToplevel(parent_frame.winfo_toplevel())
+    win = tk.Toplevel(parent_frame.winfo_toplevel())
     win.title("Asignar medicamento")
     win.geometry("500x500")
+
+    win.overrideredirect(False)
+    win.attributes('-topmost', True)
+    win.transient(parent_frame.winfo_toplevel())
+    win.lift()
+    win.focus_set()
     
     open_dialogs.append(win)
     
