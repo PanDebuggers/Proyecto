@@ -78,24 +78,21 @@ def asignar_medicamento_a_tratamiento(**kwargs):
     if not medicamento:
         raise ValueError("Medicamento no encontrado")
 
-    # Establecer fechas por defecto
-    kwargs.setdefault("fecha_inicio", tratamiento["fecha_inicio"])
-    kwargs.setdefault("fecha_fin", tratamiento["fecha_fin"])
 
-    # Validar fechas si se proporcionan
+    # Establecer fechas por defecto y asegurarse que sean string en formato YYYY-MM-DD
+    fecha_inicio = tratamiento["fecha_inicio"]
+    fecha_fin = tratamiento["fecha_fin"]
     if "fecha_inicio" in kwargs and kwargs["fecha_inicio"] is not None:
-        try:
-            kwargs["fecha_inicio"] = datetime.strptime(
-                kwargs["fecha_inicio"], "%Y-%m-%d"
-            )
-        except ValueError:
-            raise ValueError("Formato de fecha_inicio inválido. Use YYYY-MM-DD")
-
+        fecha_inicio = kwargs["fecha_inicio"]
     if "fecha_fin" in kwargs and kwargs["fecha_fin"] is not None:
-        try:
-            kwargs["fecha_fin"] = datetime.strptime(kwargs["fecha_fin"], "%Y-%m-%d")
-        except ValueError:
-            raise ValueError("Formato de fecha_fin inválido. Use YYYY-MM-DD")
+        fecha_fin = kwargs["fecha_fin"]
+    # Convertir a string si son datetime
+    if isinstance(fecha_inicio, datetime):
+        fecha_inicio = fecha_inicio.strftime("%Y-%m-%d")
+    if isinstance(fecha_fin, datetime):
+        fecha_fin = fecha_fin.strftime("%Y-%m-%d")
+    kwargs["fecha_inicio"] = str(fecha_inicio)
+    kwargs["fecha_fin"] = str(fecha_fin)
 
     # Eliminar toda lógica de hora_preferida
     if "hora_preferida" in kwargs:

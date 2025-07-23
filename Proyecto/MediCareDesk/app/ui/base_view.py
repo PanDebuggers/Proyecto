@@ -62,15 +62,7 @@ def iniciar_aplicacion(email, root):
             font=("Arial", 16),
         ).pack(expand=True)
 
-    frame_alertas = tk.Frame(
-        frame_derecho, bg="#f0f0f0", highlightbackground="black", highlightthickness=2
-    )
-    frame_alertas.pack(side=tk.BOTTOM, fill=tk.X)
-
-    lbl_alerta = tk.Label(
-        frame_alertas, text="Sin alertas", bg="#f0f0f0", fg="red", font=("Arial", 12)
-    )
-    lbl_alerta.pack(pady=5)
+    # Recuadro de alertas eliminado
 
     # ✅ Toma el id del cuidador logueado desde session
     cuidador_actual = session.cuidador_actual
@@ -106,36 +98,8 @@ def __mostrar_tomas_dia(frame, id_cuidador):
 
 
 def __mostrar_historial_tomas(frame, id_cuidador):
-    from app.ui.historial_tomas import mostrar_historial_tomas
-    from app.db import modelos
-
-    pacientes = modelos.obtener_pacientes()
-    pacientes_cuidador = [p for p in pacientes if p["id_cuidador"] == id_cuidador]
-    if not pacientes_cuidador:
-        tk.Label(
-            frame, text="No hay pacientes registrados.", bg="#f0f0f0", fg="gray"
-        ).pack(pady=20)
-        return
-
-    def seleccionar_paciente():
-        seleccion = lista.curselection()
-        if not seleccion:
-            return
-        idx = seleccion[0]
-        paciente = pacientes_cuidador[idx]
-        mostrar_historial_tomas(frame, paciente["id_paciente"], paciente["nombre"])
-
-    for widget in frame.winfo_children():
-        widget.destroy()
-    tk.Label(
-        frame, text="Seleccione un paciente:", font=("Arial", 14), bg="#f0f0f0"
-    ).pack(pady=10)
-    lista = tk.Listbox(frame, font=("Arial", 12), height=8)
-    for p in pacientes_cuidador:
-        lista.insert(tk.END, p["nombre"])
-    lista.pack(pady=10)
-    btn = tk.Button(frame, text="Ver historial", command=seleccionar_paciente)
-    btn.pack(pady=5)
+    from app.ui.historial_todas_tomas_cuidador import mostrar_historial_todas_tomas_cuidador
+    mostrar_historial_todas_tomas_cuidador(frame, id_cuidador)
 
 
 def __mostrar_alertas(frame, id_cuidador):

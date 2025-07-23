@@ -20,9 +20,13 @@ def mostrar_tomas_dia(frame, id_cuidador):
         frame, text="Tomas de la semana", font=("Arial", 18, "bold"), bg="#f0f0f0"
     ).pack(pady=10)
 
-    columnas = ("Fecha", "Hora", "Paciente", "Medicamento", "Estado")
+
+    columnas = ("ID", "Fecha", "Hora", "Paciente", "Medicamento", "Estado")
     tabla = ttk.Treeview(frame, columns=columnas, show="headings", height=16)
-    for col in columnas:
+    # Ocultar la columna ID visualmente
+    tabla.heading("ID", text="")
+    tabla.column("ID", width=0, stretch=False)
+    for col in columnas[1:]:
         tabla.heading(col, text=col)
         tabla.column(col, anchor="center", width=120)
     tabla.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
@@ -40,6 +44,7 @@ def mostrar_tomas_dia(frame, id_cuidador):
             "",
             "end",
             values=(
+                toma["id_toma"],
                 toma["fecha"],
                 toma["hora_programada"],
                 toma["nombre_paciente"],
@@ -64,8 +69,11 @@ def mostrar_tomas_dia(frame, id_cuidador):
             )
             return
         item = seleccion[0]
-        id_toma = tabla.item(item, "values")[0]
-        modelos.actualizar_estado_toma(id_toma, estado)
+        id_toma = tabla.item(item, "values")[0]  # Ahora el id_toma es el primer valor
+        if estado == "verificada":
+            modelos.actualizar_estado_toma_verificada(id_toma)
+        else:
+            modelos.actualizar_estado_toma(id_toma, estado)
         mostrar_tomas_dia(frame, id_cuidador)  # Refrescar la vista
 
     btn_frame = tk.Frame(frame, bg="#f0f0f0")
@@ -84,5 +92,6 @@ def mostrar_tomas_dia(frame, id_cuidador):
         fg_color="#FF6347",
     )
     btn_omitida.pack(side="left", padx=10)
+    # Botón de verificada eliminado
 
     # ...existing code...

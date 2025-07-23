@@ -1,3 +1,15 @@
+def actualizar_estado_toma_verificada(id_toma):
+    conn = obtener_conexion()
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        UPDATE Toma SET estado = 'verificada', verificada = 1 WHERE id_toma = ?
+        """,
+        (id_toma,),
+    )
+    conn.commit()
+    if conn is not globals().get("conexion", None):
+        conn.close()
 # Obtener la próxima toma semanal de cada paciente del cuidador
 def obtener_proximas_tomas_semanales_por_paciente(id_cuidador):
     import datetime
@@ -19,6 +31,7 @@ def obtener_proximas_tomas_semanales_por_paciente(id_cuidador):
     )
     pacientes = cursor.fetchall()
     proximas_tomas = []
+    now = datetime.datetime.now()
     for id_paciente, nombre_paciente in pacientes:
         cursor.execute(
             """
@@ -36,12 +49,42 @@ def obtener_proximas_tomas_semanales_por_paciente(id_cuidador):
             (id_paciente, fecha_inicio, fecha_fin),
         )
         tomas_paciente = cursor.fetchall()
-        if tomas_paciente:
-            # Agrupar por fecha/hora y tomar la más próxima
-            primera_toma = tomas_paciente[0]
-            toma = dict(zip([col[0] for col in cursor.description], primera_toma))
+        print(f"[DEBUG] Paciente: {nombre_paciente}, tomas recuperadas: {tomas_paciente}")
+        atrasadas = []
+        proximas = []
+        for t in tomas_paciente:
+            fecha_str = f"{t[1]} {t[2]}"
+            fecha_hora = None
+            formatos = ["%Y-%m-%d %H:%M", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H.%M", "%Y-%m-%d %H.%M.%S"]
+            for fmt in formatos:
+                try:
+                    fecha_hora = datetime.datetime.strptime(fecha_str, fmt)
+                    break
+                except Exception:
+                    continue
+            if fecha_hora is None:
+                print(f"[DEBUG] Error parseando fecha/hora: {fecha_str} - formatos probados: {formatos}")
+                continue
+            if fecha_hora < now:
+                atrasadas.append(t)
+            else:
+                proximas.append(t)
+        print(f"[DEBUG] Paciente: {nombre_paciente}, atrasadas: {atrasadas}, proximas: {proximas}")
+        # Si hay atrasadas, mostrar la más antigua
+        if atrasadas:
+            atrasadas.sort(key=lambda x: (x[1], x[2], nombre_paciente))
+            toma = dict(zip([col[0] for col in cursor.description], atrasadas[0]))
             toma["nombre_paciente"] = nombre_paciente
+            toma["alerta_tipo"] = "atrasada"
             proximas_tomas.append(toma)
+        elif proximas:
+            proximas.sort(key=lambda x: (x[1], x[2], nombre_paciente))
+            toma = dict(zip([col[0] for col in cursor.description], proximas[0]))
+            toma["nombre_paciente"] = nombre_paciente
+            toma["alerta_tipo"] = "proxima"
+            proximas_tomas.append(toma)
+    # Ordenar la lista final por fecha/hora y nombre paciente
+    proximas_tomas.sort(key=lambda t: (t["fecha"], t["hora_programada"], t["nombre_paciente"]))
     if conn is not globals().get("conexion", None):
         conn.close()
     return proximas_tomas
@@ -106,8 +149,7 @@ def obtener_historial_tomas_paciente(id_paciente):
     cursor = conn.cursor()
     query = """
         SELECT Toma.id_toma, Toma.fecha, Toma.hora_programada, Toma.estado, 
-               Medicamento.nombre AS nombre_medicamento,
-               COALESCE(Toma.verificada, 0) AS verificada
+               Medicamento.nombre AS nombre_medicamento
         FROM Toma
         JOIN Tratamiento_Medicamento ON Toma.id_tratamiento_medicamento = Tratamiento_Medicamento.id_tratamiento_medicamento
         JOIN Tratamiento ON Tratamiento_Medicamento.id_tratamiento = Tratamiento.id_tratamiento
@@ -119,6 +161,7 @@ def obtener_historial_tomas_paciente(id_paciente):
     tomas = [
         dict(zip([col[0] for col in cursor.description], row))
         for row in cursor.fetchall()
+        if dict(zip([col[0] for col in cursor.description], row))["estado"] in ("omitida", "tomada")
     ]
     if conn is not globals().get("conexion", None):
         conn.close()
@@ -297,13 +340,18 @@ def buscar_cuidador_por_credenciales(email, password_hash):
 #    return sqlite3.connect("MediCareDesk.db")
 
 
-def obtener_pacientes(activos=True):
-    """Obtiene todos los pacientes (solo activos por defecto)"""
+def obtener_pacientes(activos=True, id_cuidador=None):
+    """Obtiene todos los pacientes (solo activos por defecto, y opcionalmente por cuidador)"""
     conn = obtener_conexion()
     cursor = conn.cursor()
-    query = "SELECT * FROM Paciente"
+    query = "SELECT p.*, cp.id_cuidador FROM Paciente p JOIN Cuidador_Paciente cp ON cp.id_paciente = p.id_paciente"
+    condiciones = []
     if activos:
-        query += " WHERE activo = 1"
+        condiciones.append("p.activo = 1")
+    if id_cuidador is not None:
+        condiciones.append(f"cp.id_cuidador = {id_cuidador}")
+    if condiciones:
+        query += " WHERE " + " AND ".join(condiciones)
     cursor.execute(query)
     pacientes = [dict(paciente) for paciente in cursor.fetchall()]
     if conn is not globals().get("conexion", None):

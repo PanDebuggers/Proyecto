@@ -16,7 +16,7 @@ def mostrar_alertas_semanales(frame, id_cuidador):
         bg="#f0f0f0",
     ).pack(pady=10)
 
-    columnas = ("Paciente", "Fecha", "Hora", "Medicamento", "Estado")
+    columnas = ("Paciente", "Fecha", "Hora", "Medicamento", "Estado", "Alerta")
     tabla = ttk.Treeview(frame, columns=columnas, show="headings", height=10)
     for col in columnas:
         tabla.heading(col, text=col)
@@ -33,6 +33,7 @@ def mostrar_alertas_semanales(frame, id_cuidador):
     tomas = modelos.obtener_proximas_tomas_semanales_por_paciente(id_cuidador)
     for toma in tomas:
         color = estados_colores.get(toma["estado"], "white")
+        alerta_txt = "Atrasada" if toma.get("alerta_tipo") == "atrasada" else "Próxima"
         tabla.insert(
             "",
             "end",
@@ -42,10 +43,15 @@ def mostrar_alertas_semanales(frame, id_cuidador):
                 toma["hora_programada"],
                 toma["nombre_medicamento"],
                 toma["estado"].capitalize(),
+                alerta_txt,
             ),
-            tags=(toma["estado"],),
+            tags=(toma["estado"], alerta_txt),
         )
         tabla.tag_configure(toma["estado"], background=color)
+        if alerta_txt == "Atrasada":
+            tabla.tag_configure("Atrasada", foreground="red", font=("Arial", 12, "bold"))
+        else:
+            tabla.tag_configure("Próxima", foreground="black")
 
     if not tomas:
         tk.Label(
