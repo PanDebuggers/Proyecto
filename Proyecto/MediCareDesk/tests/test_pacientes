@@ -1,0 +1,145 @@
+import unittest
+from unittest.mock import MagicMock, patch
+import sqlite3
+import sys
+import os
+
+# Asegúrate de que la ruta de tu proyecto esté correctamente configurada
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "MediCareDesk")))
+
+import tkinter as tk
+from tkinter import ttk
+import customtkinter as ctk
+from io import StringIO
+
+# Suponemos que la función mostrar_pacientes está en el archivo 'mi_script.py'
+from app.ui.pacientes import mostrar_pacientes
+
+class TestMostrarPacientes(unittest.TestCase):
+
+    # Mock de la conexión a la base de datos y Treeview
+    @patch('app.ui.pacientes.sqlite3.connect')  # Mock de la conexión a la base de datos
+    @patch('app.ui.pacientes.ttk.Treeview')  # Mock de Treeview
+    @patch('app.ui.pacientes.tk.Frame')  # Mock de Frame
+    def test_cargar_datos(self, mock_frame, mock_treeview, mock_connect):
+        print("Ejecutando test_cargar_datos...")
+
+        # Mock de la conexión y el cursor
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+
+        # Simular que la consulta a la base de datos devuelve filas de pacientes
+        mock_cursor.fetchall.return_value = [
+            (1, "Juan Pérez", 30, "M", "123456789", 1, 5, 3),
+            (2, "María López", 25, "F", "987654321", 1, 2, 1),
+        ]
+
+        # Crear un mock del frame
+        frame = MagicMock()
+
+        # Crear un mock del Treeview (sin necesidad de crear una ventana real)
+        mock_tree = MagicMock()
+        mock_frame.return_value = frame
+        mock_treeview.return_value = mock_tree
+
+        # Llamar a la función que carga los datos
+        mostrar_pacientes(frame, id_cuidador=1)
+
+        # Verificar que la consulta a la base de datos fue ejecutada correctamente
+        mock_cursor.execute.assert_called_with(
+            """
+            SELECT 
+                id_paciente, nombre, edad, genero,
+                contacto_emergencia, activo,
+                tratamientos_totales, tratamientos_activos
+            FROM Vista_Pacientes
+            WHERE id_cuidador = ?
+            """, (1,)
+        )
+
+        # Verificar que los datos fueron insertados en el treeview (con el método insert)
+        mock_tree.insert.assert_any_call("", "end", values=(1, "Juan Pérez", 30, "M", "123456789", 1, 5, 3))
+        mock_tree.insert.assert_any_call("", "end", values=(2, "María López", 25, "F", "987654321", 1, 2, 1))
+
+    @patch('app.ui.pacientes.tk.messagebox.showerror')  # Mock de la ventana de error
+    @patch('app.ui.pacientes.sqlite3.connect')  # Mock de la conexión a la base de datos
+    def test_agregar_paciente(self, mock_connect, mock_showerror):
+        print("Ejecutando test_agregar_paciente...")
+
+        # Mock de la conexión y el cursor
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+
+        # Crear una ventana de formulario de agregar paciente (mock)
+        form = tk.Toplevel()
+        nombre_entry = tk.Entry(form)
+        edad_entry = tk.Entry(form)
+        genero_entry = tk.Entry(form)
+        contacto_entry = tk.Entry(form)
+
+        # Definir lo que debe devolver cada Entry cuando se obtenga el valor
+        nombre_entry.get = MagicMock(return_value="Carlos")
+        edad_entry.get = MagicMock(return_value="40")
+        genero_entry.get = MagicMock(return_value="M")
+        contacto_entry.get = MagicMock(return_value="123456789")
+
+        # Crear un mock de Text para el campo de observaciones
+        observaciones_entry = MagicMock()
+        observaciones_entry.get.return_value = "Observaciones del paciente"
+
+        # Llamar al método guardar_paciente que debe usar los valores mockeados
+        with patch('app.ui.pacientes.tk.Entry', return_value=nombre_entry), \
+             patch('app.ui.pacientes.tk.Entry', return_value=edad_entry), \
+             patch('app.ui.pacientes.tk.Entry', return_value=genero_entry), \
+             patch('app.ui.pacientes.tk.Entry', return_value=contacto_entry), \
+             patch('app.ui.pacientes.tk.Text', return_value=observaciones_entry):
+
+            # Llamamos a la función que agrega un paciente
+            mostrar_pacientes(form, id_cuidador=1)
+
+            # Verificar que la función de inserción a la base de datos fue llamada correctamente
+            mock_cursor.execute.assert_any_call(
+                """
+                INSERT INTO Paciente (nombre, edad, genero, contacto_emergencia, observaciones)
+                VALUES (?, ?, ?, ?, ?)
+                """, ("Carlos", "40", "M", "123456789", "Observaciones del paciente")
+            )
+
+    @patch('app.ui.pacientes.tk.messagebox.showerror')  # Mock de la ventana de error
+    @patch('app.ui.pacientes.sqlite3.connect')  # Mock de la conexión a la base de datos
+    def test_eliminar_paciente(self, mock_connect, mock_showerror):
+        print("Ejecutando test_eliminar_paciente...")
+
+        # Mock de la conexión y el cursor
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+
+        # Simular que el paciente fue seleccionado
+        selected_item = MagicMock()
+        selected_item = (1, "Juan Pérez", 30, "M", "123456789", 1, 5, 3)
+        
+        # Crear un mock del frame y Treeview
+        frame = MagicMock()
+        mock_tree = MagicMock()
+        frame.winfo_children.return_value = [mock_tree]
+        
+        # Llamar a la función que elimina al paciente
+        mostrar_pacientes(frame, id_cuidador=1)
+
+        # Verificar que la función de eliminación a la base de datos fue llamada correctamente
+        mock_cursor.execute.assert_any_call(
+            """
+            DELETE FROM Cuidador_Paciente WHERE id_cuidador = ? AND id_paciente = ?
+            """, (1, 1)
+        )
+
+if __name__ == '__main__':
+    unittest.main()
+
+

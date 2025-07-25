@@ -1,6 +1,12 @@
 #Creado por CatherineHerrera96
 
 import unittest
+import os
+import sys
+
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
+)
 from app.logic.auth import validar_credenciales
 
 class TestAuth(unittest.TestCase):
