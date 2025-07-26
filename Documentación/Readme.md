@@ -22,9 +22,7 @@ Diseñar e implementar un sistema que permita administrar y supervisar el consum
 📚 Historias de usuarios 
 📚 proyecto (documentación adicional) 
 
-⚙️ Instrucciones de Uso (Se definirán cuando el proyecto esté en desarrollo.)
 
-🤝 Instrucciones para Contribuir (Reglas de contribución serán agregadas más adelante.)
 
 
 #Enlaces utiles 
